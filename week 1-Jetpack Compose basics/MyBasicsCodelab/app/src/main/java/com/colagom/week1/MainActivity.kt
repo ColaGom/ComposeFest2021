@@ -3,6 +3,7 @@ package com.colagom.week1
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -28,9 +29,23 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
+private fun MyApp(
+    names: List<String> = listOf("Foo", "Bar")
+) {
+    Column {
+        names.forEach {
+            Greeting(name = it)
+        }
+    }
+}
+
+@Composable
 fun Greeting(name: String) {
     Surface(color = MaterialTheme.colors.primary) {
-        Text(text = "Hello $name!", modifier = Modifier.padding(24.dp))
+        Column(modifier = Modifier.padding(24.dp)) {
+            Text(text = "Hello,")
+            Text(text = name)
+        }
     }
 }
 
@@ -38,6 +53,6 @@ fun Greeting(name: String) {
 @Composable
 fun DefaultPreview() {
     Week1Theme {
-        Greeting("Android")
+        MyApp()
     }
 }
