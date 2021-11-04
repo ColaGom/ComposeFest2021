@@ -20,8 +20,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.AlignmentLine
+import androidx.compose.ui.layout.FirstBaseline
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
 import com.colagom.composelayout.ui.theme.ComposeLayoutTheme
@@ -62,14 +67,13 @@ fun LayoutsCodelab() {
     }
 }
 
-@Composable
-fun BodyContent(modifier: Modifier = Modifier) {
-    Column(modifier = modifier.padding(8.dp)) {
-        ImageList()
-    }
-}
+//@Composable
+//fun BodyContent(modifier: Modifier = Modifier) {
+//    Column(modifier = modifier.padding(8.dp)) {
+//        ImageList()
+//    }
+//}
 
-@Preview
 @Composable
 fun LayoutCodelabPreview() {
     ComposeLayoutTheme {
@@ -91,7 +95,6 @@ fun ImageListItem(idx: Int) {
     }
 }
 
-@Preview
 @Composable
 fun ImageList() {
     val listSize = 100
@@ -157,10 +160,78 @@ fun PhotographerCard(modifier: Modifier = Modifier) {
     }
 }
 
-@Preview
 @Composable
 fun PhotographerCardPreview() {
     ComposeLayoutTheme {
         PhotographerCard()
+    }
+}
+
+fun Modifier.firstBaselistToTop(
+    firstBaselineToTop: Dp
+) = this.then(
+    layout { measurable, constraints ->
+        val placeable = measurable.measure(constraints)
+
+        check(placeable[FirstBaseline] != AlignmentLine.Unspecified)
+        val firstBaseline = placeable[FirstBaseline]
+
+        val placeableY = firstBaselineToTop.roundToPx() - firstBaseline
+        val height = placeable.height + placeableY
+        layout(placeable.width, height) {
+            placeable.placeRelative(0, placeableY)
+        }
+    }
+)
+
+@Preview
+@Composable
+fun TextWithPaddingBaselinePreview() {
+    ComposeLayoutTheme {
+        Text(text = "Hi there!", Modifier.firstBaselistToTop(32.dp))
+    }
+}
+
+@Preview
+@Composable
+fun TextWithPaddingNormalPreview() {
+    ComposeLayoutTheme {
+        Text(text = "Hi there!", Modifier.padding(top = 32.dp))
+    }
+}
+
+@Composable
+fun MyOwnColumn(
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit
+) {
+    Layout(
+        modifier = modifier,
+        content = content
+    ) { measureables, constraints ->
+
+        val placeables = measureables.map {
+            it.measure(constraints)
+        }
+
+        var yPosition = 0
+
+        layout(constraints.maxWidth, constraints.maxHeight) {
+            placeables.forEach {
+                it.placeRelative(x = 0, y = yPosition)
+                yPosition += it.height
+            }
+        }
+    }
+}
+
+@Preview
+@Composable
+fun BodyContent(modifier: Modifier = Modifier) {
+    MyOwnColumn(modifier.padding(8.dp)) {
+        Text(text = "AAAAA")
+        Text(text = "BBBB")
+        Text(text = "CCCC")
+        Text(text = "DDDD")
     }
 }
