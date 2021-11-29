@@ -41,7 +41,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.compose.rally.RallyScreen
-import java.util.Locale
+import java.util.*
 
 @Composable
 fun RallyTabRow(
@@ -57,6 +57,7 @@ fun RallyTabRow(
         Row(Modifier.selectableGroup()) {
             allScreens.forEach { screen ->
                 RallyTab(
+                    modifier = Modifier.weight(1f),
                     text = screen.name,
                     icon = screen.icon,
                     onSelected = { onTabSelected(screen) },
@@ -69,6 +70,7 @@ fun RallyTabRow(
 
 @Composable
 private fun RallyTab(
+    modifier: Modifier = Modifier,
     text: String,
     icon: ImageVector,
     onSelected: () -> Unit,
@@ -88,7 +90,7 @@ private fun RallyTab(
         animationSpec = animSpec
     )
     Row(
-        modifier = Modifier
+        modifier = modifier
             .padding(16.dp)
             .animateContentSize()
             .height(TabHeight)
@@ -103,7 +105,8 @@ private fun RallyTab(
                     color = Color.Unspecified
                 )
             )
-            .clearAndSetSemantics { contentDescription = text }
+            .clearAndSetSemantics { contentDescription = text },
+        horizontalArrangement = Arrangement.Center
     ) {
         Icon(imageVector = icon, contentDescription = text, tint = tabTintColor)
         if (selected) {
